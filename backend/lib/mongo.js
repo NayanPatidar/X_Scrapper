@@ -1,8 +1,12 @@
+require("dotenv").config({ path: "../.env" });
 const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
-require("dotenv").config();
 
-const url = process.env.MONGO_URI;
+const url = process.env.MONGOURI;
+
+if (!url) {
+  console.error("Error: MONGO_URI is not defined in your .env file.");
+  process.exit(1);
+}
 
 mongoose
   .connect(url)

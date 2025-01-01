@@ -1,5 +1,5 @@
-const mongoose = require("../lib/mongo");
-const uuidv4 = require("uuid");
+const mongoose = require("./mongo");
+const {v4 : uuidv4} = require("uuid");
 
 const trendSchema = new mongoose.Schema({
   uniqueId: { type: String, default: uuidv4 },
