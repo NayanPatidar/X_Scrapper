@@ -75,6 +75,14 @@ function App() {
                 </li>
               ))}
             </ul>
+            <a
+            onClick={() => {
+              runSeleniumScript();
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            Click here to run the script again
+          </a>
           </>
         )}
       </div>
