@@ -1,24 +1,47 @@
 const { Builder, By, until } = require("selenium-webdriver");
 const { Options } = require("selenium-webdriver/chrome");
 const chrome = require("selenium-webdriver/chrome");
+const dotenv = require("dotenv");
+dotenv.config();
 
-const twitterUsername = "nayanpatidar128@gmail.com";
-const twitterPassword = "";
+const twitterUsername = process.env.USERNAME;
+const twitterPassword = process.env.PASSWORD;
+const proxyMesh = process.env.PROXYMESH;
 
 function setupOptions() {
   const options = new Options();
-  options.addArguments("--headless");
+  const user_agent =
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.89 Safari/537.36";
+  options.addArguments(`--user-agent=${user_agent}`);
   options.addArguments("--no-sandbox");
+  options.addArguments("--headless");
   options.addArguments("--disable-dev-shm-usage");
   options.addArguments("--disable-gpu");
+  // console.log(`--proxy-server=http://${proxyMesh}`);
+
+  // if (proxyMesh) {
+  //   const proxyUrl = `http://${proxyMesh}`;
+  //   options.addArguments(`--proxy-server=${proxyUrl}`);
+  // }
   return options;
 }
 
 async function setupDriver() {
   return await new Builder()
     .forBrowser("chrome")
-    // .setChromeOptions(setupOptions())
+    .setChromeOptions(setupOptions())
     .build();
+}
+
+async function getPublicIp() {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error("Failed to fetch IP address:", error.message);
+    return "Unknown IP";
+  }
 }
 
 async function loginToX(driver) {
@@ -51,6 +74,7 @@ async function loginToX(driver) {
 }
 
 async function fetchTrendingTopics(driver) {
+  let topics = [];
   try {
     const trendElements = await driver.wait(
       until.elementsLocated(By.xpath("//div[@data-testid='trend']")),
@@ -77,8 +101,8 @@ async function seleniumScript() {
   try {
     driver = await setupDriver();
     await loginToX(driver);
-    const trendingTopics = await fetchTrendingTopics(driver);
-    return trendingTopics;
+    const trends = await fetchTrendingTopics(driver);
+    return { trends };
   } finally {
     if (driver) {
       await driver.quit();
